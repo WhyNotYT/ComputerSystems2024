@@ -1,5 +1,9 @@
 # Prerequisites
 *.d
+.launches/
+.metadata/
+.settings/
+.vscode/
 
 # Object files
 *.o
