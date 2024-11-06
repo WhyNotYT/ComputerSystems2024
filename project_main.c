@@ -101,7 +101,7 @@ void updateSensorData(float ax, float ay, float az)
 #define MAX_SAMPLES_TO_CHECK 20 // Number of samples to check for gesture confirmation
 #define EPSILON 0.05            // Small epsilon for float comparisons
 #define MAX_MORSE_LENGTH 10     // Maximum length of Morse code
-#define IGNORE_SAMPLES 50       // Number of samples to ignore after detection
+#define IGNORE_SAMPLES 100       // Number of samples to ignore after detection
 #define RECIEVE_BUFFER_SIZE 64
 typedef enum
 {
@@ -393,6 +393,7 @@ void button1Fxn(PIN_Handle handle, PIN_Id pinId)
         {
             morseCode[morseIndex++] = ' '; // Add space
             morseCode[morseIndex] = '\0';  // Null-terminate
+
         }
     }
 }
