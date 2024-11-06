@@ -1,0 +1,83 @@
+
+void updateDisplay()
+{
+    // Function to update the display with the current Morse code sequence
+    if (displayHandle)
+    {
+        Display_clear(displayHandle);                   // Clear the display
+        Display_print0(displayHandle, 1, 1, morseCode); // Print the Morse code
+    }
+}
+void displayTaskFxn(UArg arg0, UArg arg1)
+{
+    // Configure LCD control pins
+    PIN_Config lcdPinTable[] = {
+        Board_LCD_EXTCOMIN | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MIN, // EXTCOMIN
+        Board_LCD_EXTMODE | PIN_GPIO_OUTPUT_EN | PIN_GPIO_LOW | PIN_PUSHPULL | PIN_DRVSTR_MIN,  // EXTMODE
+        Board_LCD_ENABLE | PIN_GPIO_OUTPUT_EN | PIN_GPIO_HIGH | PIN_PUSHPULL | PIN_DRVSTR_MIN,  // ENABLE
+        PIN_TERMINATE};
+
+    // Open LCD pins
+    PIN_State pinState;
+    PIN_Handle lcdPinHandle = PIN_open(&pinState, lcdPinTable);
+    if (!lcdPinHandle)
+    {
+        System_printf("Error initializing LCD pins\n");
+        System_flush();
+        return;
+    }
+
+    // Set LCD control pins to proper state
+    PIN_setOutputValue(lcdPinHandle, Board_LCD_ENABLE, 1);   // Enable LCD
+    PIN_setOutputValue(lcdPinHandle, Board_LCD_EXTMODE, 0);  // EXTMODE low
+    PIN_setOutputValue(lcdPinHandle, Board_LCD_EXTCOMIN, 0); // EXTCOMIN low
+
+    // Initialize Display
+    Display_Params displayParams;
+    Display_Params_init(&displayParams);
+    displayParams.lineClearMode = DISPLAY_CLEAR_BOTH;
+
+    displayHandle = Display_open(Display_Type_LCD, &displayParams);
+    if (displayHandle == NULL)
+    {
+        System_printf("Error initializing Display\n");
+        System_flush();
+        return;
+    }
+
+    // Clear the display
+    Display_clear(displayHandle);
+
+    // Main display loop
+    while (1)
+    {
+        System_printf("Printing to display...\n");
+        System_flush();
+        Display_clear(displayHandle);
+        Display_print0(displayHandle, 0, 0, "Balls");
+
+        // Toggle EXTCOMIN pin to prevent LCD DC bias
+        PIN_setOutputValue(lcdPinHandle, Board_LCD_EXTCOMIN, !PIN_getOutputValue(Board_LCD_EXTCOMIN));
+
+        Task_sleep(1000000 / Clock_tickPeriod);
+    }
+}
+
+
+main :
+
+    // // Display task variables
+    Task_Handle displayTask;
+Task_Params displayTaskParams;
+
+// Display task
+Task_Params_init(&displayTaskParams);
+displayTaskParams.stackSize = STACKSIZE;
+displayTaskParams.stack = &displayTaskStack;
+displayTaskParams.priority = 2;
+
+displayTask = Task_create(displayTaskFxn, &displayTaskParams, NULL);
+if (displayTask == NULL)
+{
+    System_abort("Task create failed!");
+}
