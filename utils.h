@@ -46,19 +46,13 @@ void printFloat(float value)
 void displaySensorAvg(float *arx, float *ary, float *arz, const unsigned int arrSize)
 {
     // Print the header
-    System_printf("time,ax,ay,az,gx,gy,gz\n");
+    System_printf("ax,ay,az\n");
     int i;
-    printFloat(calculateAvg(arx, arrSize));
+    printFloat(arx[0]);
     System_printf(",");
-    printFloat(calculateAvg(ary, arrSize));
+    printFloat(ary[0]);
     System_printf(",");
-    printFloat(calculateAvg(arz, arrSize));
-    // System_printf(",");
-    // printFloat(gx[i]); // You may also print gy and gz if you have them
-    // System_printf(",");
-    // printFloat(gy[i]);
-    // System_printf(",");
-    // printFloat(gz[i]);
+    printFloat(arz[0]);
     System_printf("\n");
 
     System_flush();
